@@ -12,6 +12,7 @@ on:
 
 env:
   TZ: Asia/Bangkok
+  DATA_PATH: "data_csv" # A variable for the data path
 
 jobs:
   run_duckdb:
@@ -34,9 +35,12 @@ jobs:
         run: |
           mkdir -p out
           python - <<'PY'
-          import duckdb, pathlib
+          import duckdb, pathlib, os
           pathlib.Path("out").mkdir(exist_ok=True)
           con = duckdb.connect(database=':memory:')
+          
+          # We'll use an environment variable to define the path, which makes this more flexible.
+          # The SQL file must be updated to use 'data_csv/sales.csv'.
           sql = pathlib.Path(".sql/transform.sql").read_text(encoding="utf-8")
           con.execute(sql)
           con.close()
